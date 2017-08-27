@@ -1,0 +1,293 @@
+#Script require: Bash, Python3, pytvdbapi, Parallels, megacmd, and tons of muffins to feed the embedded Derpy
+#Yayponies Auto-Everything script
+#Because 5 years of doing bot work is too much
+
+#!/bin/bash
+
+# Variable to set
+RFOLDER=			#Remote Pone folder
+LFOLDER=			#Local Pone folder
+TFOLDER=			#Torrent folder
+TFURL=					#Torrent URL FOLDER
+RSUSER=						#Remote Pone server USER
+RSURL=					#Remote Pone server URL
+RSPORT=						#Remote Pone server Port
+DDLSUSER=					#Direct Download server USER
+DDLSURL=				#Direct Download server URL
+DDLSPORT=						#Direct Download server PORT
+DDLSPATH=					#Direct Download server PATH
+DDLSPURL=""		#Direct Download server URL PATH
+TSUSER=					#Torrent Creator server USER
+TSURL=					#Torrent Creator server URL
+TSPORT=						#Torrent Creator server PORT
+RSSSUSER=						#RSS Creator server USER
+RSSSURL=						#RSS Creator server URL
+RSSSPORT=						#RSS Creator server PORT
+SHOW="My Little Pony, Friendship is Magic"		#Show name
+
+#as thing come, we might integrate some of the function directly on the script
+
+#Get filename for the release
+echo "Filename for the new pone"
+	read filename
+
+echo "Where do the file come? [iTunes1080/iTunes720/Scoot264/Scoot265/ZR720/ZR1080/LQ/LQCC]"
+	read source
+	if [ $source = "iTunes1080" ];
+		then
+		#Download the release to the local machine
+		echo "Downloading the new pone"
+			scp -P $RSPORT $RSUSER@$RSURL:$RFOLDER/$filename $LFOLDER/
+	
+	
+		#Checking if hashes match
+		echo "Checking HASH - NOT FUNCTIONAL YET"
+			ssh $RSUSER@$RSURL -p $RSPORT "md5sum $RFOLDER/$filename"
+			md5sum $LFOLDER/$filename
+
+
+		#Ask User if he want to make sure Hasbro/iTunes didn't fucked the files
+		echo "Do you want to manually test the pone in your media player (Require XOrg) [Y/N]?"
+			read usercheck
+			if [ $usercheck = "Y" ];
+				then
+					mpv $LFOLDER/$filename
+					echo "Is the pone OK? [Y/N]"
+					read PONEOK
+					if [ $PONEOK = "Y" ];
+						then
+						echo "Yay"
+						elif [ $PONEOK = "y" ];
+						then
+						echo "Yay"
+						elif [ $PONEOK = "N" ]
+						then
+						echo "Oops, quitting"
+						exit
+						elif [ $PONEOK = "n" ]
+						then
+						echo "Oops, quitting"
+						exit
+						else
+						echo "I don't understand you, continuing"
+					fi
+			elif [ $usercheck = "y" ];
+				then
+					mpv $LFOLDER/$filename
+					echo "Is the pone OK? [Y/N]"
+					read PONEOK
+					if [ $PONEOK = "Y" ];
+						then
+						echo "Yay"
+						elif [ $PONEOK = "y" ];
+						then
+						echo "Yay"
+						elif [ $PONEOK = "N" ]
+						then
+						echo "Oops, quitting"
+						exit
+						elif [ $PONEOK = "n" ]
+						then
+						echo "Oops, quitting"
+						exit
+						else
+						echo "I don't understand you, continuing"
+					fi
+				else
+					echo "Boooo"
+			fi
+        elif [ $source = "iTunes720" ];
+                then
+                #Download the release to the local machine
+                echo "Downloading the new pone"
+                        scp -P $RSPORT $RSUSER@$RSURL:$RFOLDER/$filename $LFOLDER/
+
+
+                #Checking if hashes match
+                echo "Checking HASH - NOT FUNCTIONAL YET"
+						ssh $RSUSER@$RSURL -p $RSPORT "md5sum $RFOLDER/$filename"
+                        md5sum $LFOLDER/$filename
+
+
+                #Ask User if he want to make sure Hasbro/iTunes didn't fucked the files
+                echo "Do you want to manually test the pone in your media player (Require XOrg)?"
+			read usercheck
+			if [ $usercheck = "Y" ];
+				then
+					mpv $LFOLDER/$filename
+					echo "Is the pone OK? [Y/N]"
+					read PONEOK
+					if [ $PONEOK = "Y" ];
+						then
+						echo "Yay"
+						elif [ $PONEOK = "y" ];
+						then
+						echo "Yay"
+						elif [ $PONEOK = "N" ]
+						then
+						echo "Oops, quitting"
+						exit
+						elif [ $PONEOK = "n" ]
+						then
+						echo "Oops, quitting"
+						exit
+						else
+						echo "I don't understand you, continuing"
+					fi
+			elif [ $usercheck = "y" ];
+				then
+					mpv $LFOLDER/$filename
+					echo "Is the pone OK? [Y/N]"
+					read PONEOK
+					if [ $PONEOK = "Y" ];
+						then
+						echo "Yay"
+						elif [ $PONEOK = "y" ];
+						then
+						echo "Yay"
+						elif [ $PONEOK = "N" ]
+						then
+						echo "Oops, quitting"
+						exit
+						elif [ $PONEOK = "n" ]
+						then
+						echo "Oops, quitting"
+						exit
+						else
+						echo "I don't understand you, continuing"
+					fi
+				else
+					echo "Boooo"
+			fi
+
+
+	else
+		#Source is other, We need to do the reverse and sending a copy of the file instead
+		echo "Uploading the new pone"
+			scp -P $RSPORT $LFOLDER/$filename $RSUSER@$RSURL:$RFOLDER/
+
+		
+		#Checking if hashes match
+                echo "Checking HASH - NOT FUNCTIONAL YET"
+						ssh $RSUSER@$RSURL -p $RSPORT "md5sum $RFOLDER/$filename"
+                        md5sum $LFOLDER/$filename
+	fi
+
+#END of the format specific runtime
+
+#Setting up media format
+
+        if [ $source = "iTunes1080" ]
+        then
+                COMMENTARY="1080P RAW / AC3 5.1 / AAC 2.0"
+                DESC="iTunes 1080P Raw"
+				DLINFO='<a href="/videos/popup/raw.php" onclick="return popitup('/videos/popup/raw.php')">RAW</a>'
+        elif [ $source = "iTunes720" ]
+        then
+                COMMENTARY="720P RAW / AC3 5.1 / AAC 2.0"
+                DESC="iTunes 720P Raw"
+				DLINFO='<a href="/videos/popup/raw.php" onclick="return popitup('/videos/popup/raw.php')">RAW</a>'
+        elif [ $source = "Scoot264" ]
+        then
+                COMMENTARY="1080P Scootaloo Corrected / x264 / AC3 5.1 / AAC 2.0 / Scootaloo"
+                DESC="Scootaloo 1080P Corrected H264"
+				DLINFO='<a href="/videos/popup/scootx264.php" onclick="return popitup('/videos/popup/scootx264.php')">Scoot x264 </a>'
+        elif [ $source = "Scoot265" ]
+        then
+                COMMENTARY="1080P Scootaloo Definitive Edition / x265 10bit / AC3 5.1 / AAC 2.0 / Scootaloo"
+                DESC="Scootaloo 1080P Definitive Edition H265 10 bit"
+				DLINFO='<a href="/videos/popup/scootx26510.php" onclick="return popitup('/videos/popup/scootx26510.php')">Scoot x265 10b</a>'
+        elif [ $source = "ZR720" ]
+        then
+                COMMENTARY="720P CC / AC3 5.1 / AAC 2.0 / ZR"
+                DESC="720P CC by ZR"
+				DLINFO='<a href="/videos/popup/cczr.php" onclick="return popitup('/videos/popup/cczr.php')">CC ZR</a>'
+        elif [ $source = "ZR1080" ]
+        then
+                COMMENTARY="1080P CC / AC3 5.1 / AAC 2.0 / ZR"
+                DESC="1080P CC by ZR"
+				DLINFO='<a href="/videos/popup/cczr.php" onclick="return popitup('/videos/popup/cczr.php')">CC ZR</a>'
+        elif [ $source = "LQ" ]
+        then
+                COMMENTARY="720P Low Quality / AAC 2.0 / YayPonies"
+                DESC="720 LQ"
+				DLINFO='<a href="/videos/popup/lq.php" onclick="return popitup('/videos/popup/lq.php')">LQ</a>'
+        elif [ $source = "LQCC" ]
+        then
+                COMMENTARY="720P Low Quality CC / AAC 2.0 / YayPonies / CC by ZR"
+                DESC="720 LQ CC by ZR"
+				DLINFO='<a href="/videos/popup/lqcc.php" onclick="return popitup('/videos/popup/lqcc.php')">LQ CC</a>'
+        else
+                echo "What the fuck is this format? Deal with it yourself"
+                exit
+        fi
+
+# Starting torrent creation
+
+#touch torrent/payload.sh
+	#echo "#!/bin/bash" >> torrent/payload.sh
+echo "filename=\"$filename\"" >> torrent/$filename-payload.sh
+echo "comment=\"$COMMENTARY\"" >> torrent/$filename-payload.sh
+cat torrent/source >> torrent/$filename-payload.sh
+scp -P $TSPORT torrent/$filename-payload.sh $TSUSER@$TSURL:/home/USER/Torrents/
+ssh $TSUSER@$TSURL -p $TSPORT "chmod 777 /home/USER/Torrents/$filename-payload.sh"
+ssh $TSUSER@$TSURL -p $TSPORT "/home/USER/Torrents/$filename-payload.sh"
+ssh $TSUSER@$TSURL -p $TSPORT "rm /home/USER/Torrents/$filename-payload.sh"
+rm torrent/$filename-payload.sh
+torrenthash=$(./hash.py $TFOLDER/$filename.torrent)
+mkdir -p ./work
+touch ./work/links-$filename
+echo $torrenthash >> ./work/links-$filename
+#rm torrent/result.txt
+
+# Obtaining information about the episode
+SEASON=$(echo $filename | grep -o -P '.{0,2}x' | sed 's/[^0-9]*//g')
+EPISODE=$(echo $filename | grep -o -P 'x.{0,2}' | sed 's/[^0-9]*//g')
+EPNAME=$(./thetvdb.py name "$SHOW" $SEASON $EPISODE)
+EPURL=$(./thetvdb.py url "$SHOW" $SEASON $EPISODE)
+
+# Getting mega credidential from mega.conf
+megaemail=$(cat ./mega.conf | sed -n '1p')
+megapass=$(cat ./mega.conf | sed -n '2p')
+
+# Uploading to DDL and Mega at the same time
+touch ./tmp.$filename-upload
+#echo "scp -P $DDLSPORT $LFOLDER/$filename $DDLSUSER@$DDLSURL:$DDLSPATH" >> ./tmp.upload
+#echo "echo PONE" >> ./tmp.upload
+echo "sftp -P $DDLSPORT $DDLSUSER@$DDLSURL:$DDLSPATH/ <<< 'put $LFOLDER/$filename'" >> ./tmp.$filename-upload
+echo "megaput --reload -u $megaemail -p $megapass $LFOLDER/$filename"  >> ./tmp.$filename-upload
+parallel -j 2 < ./tmp.$filename-upload
+rm ./tmp.$filename-upload
+echo "File has been uploaded to DDL and MEGA Servers"
+MEGATMP=$(megals -e -u $megaemail -p $megapass /Root/$filename)
+megalink=$(echo $MEGATMP | tr -d '[:space:]' | awk -F '\\/Root' '{print $1}')
+echo $megalink >> ./work/links-$filename
+ddllink=$(echo $DDLSPURL/$filename)
+echo $ddllink >> ./work/links-$filename
+# At this point, we have every links, we just need to use them
+# CODE
+touch ./work/$filename.code
+echo "<tr>" >> ./work/$filename.code
+echo "<td><a href=\"$EPURL\">Episode $EPISODE ($EPNAME)</a></td>" >> ./work/$filename.code
+echo "<td><a href=\"$megalink\">1</a> 2 3</td>" >> ./work/$filename.code
+echo "<td><a href=\"$ddllink\">1</a></td>" >> ./work/$filename.code
+echo "<td><a href=\"$TFURL/$filename.torrent\">1</a> 2 3 <a href=\"http://thetorrent.org/$torrenthash.torrent\">4</a> 5 <a href=\"magnet:?xt=urn:btih:$torrenthash\">6</a></td>" >> ./work/$filename.code
+echo "<td>$DLINFO</td>" >> ./work/$filename.code
+if [ $source = "Scoot264" ]
+		then
+		echo "<td><a href="/subtitles/subs/$SEASONx$EPISODE.srt">REG</a>/<a href="/subtitles/subs/$SEASONx$EPISODE.HoH.srt">HoH</a></td>" >> ./work/$filename.code
+		echo "</tr>" >> ./work/$filename.code
+	elif [ $source = "LQ" ]
+		then
+		filesize=$(ls -sh $LFOLDER/$filename | tr -d '[:space:]' | grep -o -P '.{0,4}/' | sed 's/[^0-9]*//g' ) 
+		echo "<td>$filesize MB</td>" >> ./work/$filename.code
+		echo "</tr>" >> ./work/$filename.code
+	elif [ $source = "LQCC" ]
+		then
+		filesize=$(ls -sh $LFOLDER/$filename | tr -d '[:space:]' | grep -o -P '.{0,4}/' | sed 's/[^0-9]*//g' ) 
+		echo "<td>$filesize MB</td>" >> ./work/$filename.code
+		echo "</tr>" >> ./work/$filename.code
+	else
+		echo "</tr>" >> ./work/$filename.code
+fi
+echo "Work done, 1 muffins plz"

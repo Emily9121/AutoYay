@@ -1,0 +1,47 @@
+cd /home/USER/Torrents/
+echo "-------------------------------- "
+echo "YP Torrent Creator 0.3b Automated"
+echo "Pony Episodes				 	   "
+echo "-------------------------------- "
+folder='opt-media/Episodes/'
+echo "Pony filename is $filename"
+echo "Comment is $comment"
+/usr/local/bin/mktorrent -a udp://tracker1.wasabii.com.tw:6969/announce -a http://pow7.com/announce -a udp://tracker2.wasabii.com.tw:6969/announce -a udp://tracker.vanitycore.co:6969/announce -a http://share.camoe.cn:8080/announce -a udp://tracker.bluefrog.pw:2710/announce -a https://carbon-bonsai-621.appspot.com:443/announce -a udp://tracker.cuntflaps.me:6969/announce -a http://retracker.omsk.ru:2710/announce -a http://retracker.bashtel.ru:80/announce -a http://grifon.info:80/announce -a http://retracker.spark-rostov.ru:80/announce -a http://retracker.telecom.by:80/announce -a http://tracker.sktorrent.net:6969/announce -a http://bt.artvid.ru:6969/announce -a http://kickasstracker.com:80/announce -a udp://tracker.coppersurfer.tk:6969 -a udp://tracker.leechers-paradise.org:6969 -a udp://tracker.opentrackr.org:1337/announce -a udp://p4p.arenabg.com:1337/announce -a udp://tracker.grepler.com:6969/announce -a udp://zephir.monocul.us:6969/announce -a udp://tracker.kamigami.org:2710/announce -c "$comment" "/cygdrive/z/$folder$filename"
+echo "----"
+mkdir -p work/$filename
+mv $filename.torrent work/$filename/
+python EP-yptorrentup.py -f work/$filename -o work/$filename/uploader.txt
+while :; do
+		scp -P PORT work/$filename/$filename.torrent root@server:/mnt/YayPonies/videos/torrents/ && break
+        printf "Oops! SSH/SCP Derped. Try again? (y/N) "
+        read -n 1 retry
+        printf "\n"
+        if [ "$retry" != "y" ]; then
+                break
+        fi
+done
+touch work/$filename/uploader.txt
+cat work/$filename/uploader.txt
+mv work/$filename/$filename.torrent /cygdrive/z/videos/torrents/
+echo "-----------"
+echo "Sending to seedbox"
+while :; do
+		ssh -p PORT root@server ln -s /mnt/YayPonies/$folder$filename /var/lib/transmission/Downloads/ && break
+		printf "Oops! SSH/SCP Derped. Try again? (y/N) "
+        read -n 1 retry
+        printf "\n"
+        if [ "$retry" != "y" ]; then
+                break
+        fi
+done
+while :; do
+		ssh -p PORT root@server cp /mnt/YayPonies/videos/torrents/$filename.torrent  /var/lib/transmission/Watch/ && break
+		printf "Oops! SSH/SCP Derped. Try again? (y/N) "
+        read -n 1 retry
+        printf "\n"
+        if [ "$retry" != "y" ]; then
+                break
+        fi
+done
+echo "Everything should be OK"
+
